@@ -36,6 +36,22 @@ namespace FARVR
 		/// </summary>
 		private Dictionary<string, float> parameters;
 
+
+		//The following are existing predefined furniture objects used to verify the object created
+		/// <summary>
+		/// The furniture catalog. Contains all available furnitures in current class that users can generate
+		/// </summary>
+		private Dictionary<string, Dictionary<string, float>> FurnitureCatalog = new Dictionary<string, Dictionary<string, float>> () {
+			{"stool", new Dictionary<string, float>() {
+					{"height", 10},
+					{"legs", 2},
+					{"radius", 20}
+				}},
+			{"table", new Dictionary<string, float>() {
+					
+				}}
+		};
+
         // Creates a furniture object
 		/// <summary>
 		/// Generates a furniture object by setting all the parameters in the object.
@@ -75,6 +91,48 @@ namespace FARVR
 				DisplayObject.GetComponent<MeshCollider> ().sharedMaterial = Resources.Load ("Assets/FARVR/Prefabs/FurniturePhy") as PhysicMaterial;
 				DisplayObject.GetComponent<MeshCollider> ().cookingOptions = MeshColliderCookingOptions.InflateConvexMesh;
 			}
+		}
+
+		//Make furniture using catalog and predefined parameters
+		/// <summary>
+		/// Generates a furniture object by setting all the parameters in the object. Returns the parameters for the furniture
+		/// </summary>
+		/// <param name="ftype">The name of the furniture that we are to generate</param>
+		/// <param name="id">A unique ID for the furniture.</param>
+		public Dictionary<string, float> MakeFurniture (string ftype, int id) {
+			type = ftype;
+			ID = id;
+			// Consult FurnitureCatalog for suitable furniture
+			foreach(KeyValuePair<string, Dictionary<string, float>> entry in FurnitureCatalog) {
+				if (entry.Key == ftype) {
+					parameters = entry.Value;
+
+					// Generate object only if we have correct parameters 
+					//Make new GameObject;
+					DisplayObject = Instantiate(Prefab) as GameObject;
+
+					DisplayObject.name = type + ID.ToString ();
+					DisplayObject.AddComponent<MeshFilter> ();
+					DisplayObject.AddComponent<MeshRenderer> ();
+
+					// TODO: Add Physics collision to object
+					// furniture.DisplayObject.AddComponent<MeshCollider> ();
+					Mesh[] meshes = GetSTL ();
+					if (meshes == null) {
+						Debug.Log ("Failed to get mesh");
+					} else {
+						DisplayObject.GetComponent<MeshFilter>().mesh = meshes [0];
+						DisplayObject.AddComponent<MeshCollider> ();
+						DisplayObject.GetComponent<MeshCollider> ().sharedMesh = meshes [0];
+						DisplayObject.GetComponent<MeshCollider> ().convex = true;
+						DisplayObject.GetComponent<MeshCollider> ().sharedMaterial = Resources.Load ("Assets/FARVR/Prefabs/FurniturePhy") as PhysicMaterial;
+						DisplayObject.GetComponent<MeshCollider> ().cookingOptions = MeshColliderCookingOptions.InflateConvexMesh;
+					}
+				}
+			}
+
+			Debug.Log ("Failed to find valid furniture");
+			return parameters;
 		}
 			
 		/// <summary>
