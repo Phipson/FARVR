@@ -283,7 +283,7 @@ To play around with the Furniture API, please refer to the **APIScene** found in
 
 A thorough demonstration of the API at work is shown through [the following youtube video](https://www.youtube.com/watch?v=QbHisCfoSfE&feature=youtu.be).
 
-**--If you have video demonstrations or examples implementing this API or library, please send us your videos or work at lemurarvrfurniture@gmail.com. We would love to hear from you!--**
+**_If you have video demonstrations or examples implementing this API or library, please send us your videos or work at lemurarvrfurniture@gmail.com. We would love to hear from you!_**
 
 ### Update Log and Current Work in Progress
 - [x] Designed and documented preliminary API
