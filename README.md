@@ -1,5 +1,5 @@
 # FARVR
-By LEMUR at UCLA (Cheuk Yin Phipson Lee and Qiong (June) Xu)
+By LEMUR at UCLA (Cheuk Yin Phipson Lee and Qiong (June) Hu)
 
 The following is a repository containing a library used to optimize and simplify the manufacturing process of furniture design. FARVR is a furniture design API made by undergraduates at the UCLA LEMUR Research Lab. Beginning on June 2018, we have implemented this API to interact with furniture on Augmented Reality and Virtual Reality utilities on Unity. The ultimate goal is to design a collaborative Mixed Reality environment where multiple designers can interact in a common space and design manufacturable furniture together.
 
