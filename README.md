@@ -137,7 +137,9 @@ stool.MakeFurniture(stoolparameters, "stool", 1);
 /* Note that making multiple furnitures in one single furniture class, while it is legal, is not suggested. This would mean that multiple furnitures are sharing the same id and are instantiated in the same location */
 ```
 
-### Updating a Furniture
+----
+
+#### Updating a Furniture
 Furnitures can only be updated once it has been created. To update the furniture, users must call the following function:
 
 `public void UpdateFurniture(Dictionary<string, float> localparameters)`
@@ -157,3 +159,94 @@ Similar to our previous instance of `MakeFurniture()`, you can call `FARVR.Furni
 stool.UpdateParameter(newstoolparameters);
 ```
 
+----
+
+#### Displaying information about a Furniture
+Furniture information can be accessed using the `FARVR.Furniture.Display()` Function, which logs all the information regarding the furniture object.
+
+`public void Display();`
+**Definition**: A call to display all information about the current Furniture, include its real-world coordinates, the local parameters, the **type** and the **ID**. Currently logs the information in the console, but will look to display it as text later on.
+
+Similar to before, you can call `FARVR.Furniture.Display()` as shown:
+
+```
+/* Either in your start or update function */
+
+stool.Display();
+```
+
+Display can only be called after a furniture has been created. It cannot be called once the furniture has been destroyed.
+
+----
+
+#### Deleting a Furniture
+Because the Furniture is an object, by default, users simply have to delete the furniture by calling the following function:
+
+`Destroy(FurnitureObject);`
+
+This permanently deletes the instance of the furniture from the game. For more information, see [the Unity Documentation](https://docs.unity3d.com/ScriptReference/Object.Destroy.html).
+
+Destroy can only be called after a Furniture has been created.
+
+----
+
+#### Exporting a Furniture
+To export a furniture, simply call the function `FARVR.Furniture.Export()`, which saves the resulting mesh as an STL file.
+
+`public void Export()`
+**Definition**: Takes all existing **parameters** in the Furniture object and then sends it over to the server to generate an STL file. The bytes from the STL file will then be transferred into a .stl file that is saved with the application path.
+
+Similar to before, you can call `FARVR.Furniture.Export()` as shown:
+
+```
+/* Either in your start or update function */
+
+stool.Export();
+```
+
+Export can only be called after a furniture has been created. It cannot be called once the furniture has been destroyed.
+
+----
+
+### Adding New Furniture Types
+To add new Furniture types, users have to manually update and modify the **FurnitureCatalog** that is found in our **Furniture.cs** class. Please note that this will only work provided the server a) recognizes the Furniture **type**, b) has exactly the paramaeters it needs from **parameters** and c) the parameters fit a certain range and value that is defined by the compiler.
+
+To add an entry in the furniture type, simply follow the following format:
+
+```
+/* This is existing code in the Furniture class */
+//The following are existing predefined furniture objects used to verify the object created
+/// <summary>
+/// The furniture catalog. Contains all available furnitures in current class that users can generate
+/// </summary>
+private Dictionary<string, Dictionary<string, float>> FurnitureCatalog = new Dictionary<string, Dictionary<string, float>> () {
+	{"stool", new Dictionary<string, float>() {
+			{"height", 10},
+			{"legs", 2},
+			{"radius", 20}
+		}},
+	{"table", new Dictionary<string, float>() {
+
+		}}, /* Add a comma for every new entry you want to add */
+	{"Name_of_type_of_furniture", new Dictionary<string, float>() {
+	/* Input all viable parameters and values here */
+		}} /* etc. */
+};
+```
+
+Once this has been added, all new Furnitures should be identifiable through the FurnitureCatalog.
+
+### Example Scenes and Reference Material
+To play around with the server and understand how STL files are generated through the compiler, please refer to [oldroco](https://git.uclalemur.com/mehtank/oldroco). You can also check out its implementation on Unity using the **ServerScene** found in the **Scenes** folder of our API.
+
+To play around with the Furniture API, please refer to the **APIScene** found in the **Scenes** folder of our API.
+
+A thorough demonstration of the API at work is shown through [the following youtube video](https://www.youtube.com/watch?v=QbHisCfoSfE&feature=youtu.be).
+
+### Update Log and Current Work in Progress
+- [x] Designed and documented preliminary API
+- [ ] Tested API across AR and VR environments
+- [ ] Implemented Materials and Rendering Mesh into Furniture
+- [ ] Generate Exit Codes that detect and handle errors
+- [x] Offer example scenes for users
+- [ ] Offer transformation functions for moving, rotating, and scaling GameObject
