@@ -14,7 +14,8 @@ The following is a repository containing a library used to optimize and simplify
 	5. Displaying Information about a Furniture
 	6. Deleting a Furniture
 	7. Exporting a Furniture
-	8. Adding New Furniture Types
+	8. Transforming a Furniture
+	9. Adding New Furniture Types
 4. **Example Scenes and Reference Material**
 5. **Update Log and Current Work in Progress**
 
@@ -45,6 +46,14 @@ at the top of your file. This will enable your script to recognize the furniture
 The following diagram illustrates the lifecycle of a Furniture object, and how data is manipulated. Details will be provided for each stage in the following subsections.
 
 /* Insert Diagram here */
+
+The furniture object is first created under a Prefab known as Furniture.prefab, found in our **Prefabs** folder. From there, users can manually retrieve a Furniture object from that GameObject, which allows them to construct a Furniture using the `MakeFurniture()` function. As they are manipulating the furniture, they can get instant, real-time feedback of their modifications using the `UpdateFurniture()` function, which retrieves data from a generative backend compiler that passes an STL binary to the Unity environment. If users wish to move the furniture, while also preserving the internal parameters of the object, they can call the function `TransformFurniture()`, which translates, rotates, and scales the furniture according to the user's liking.
+
+Once furnitures have been defined, users are also free to obtain and visualize the Furniture's parameters using the `Display()` function. If users are satisfied with the Furniture, they can proceed to manufacture it by calling the `Export()` function, which saves the STL binary data as an STL file stored in the application. By default, STL files have become the standard for Computer-Aided Manufacturing, which is why the produced file will be compatible for most manufacturing utilities such as 3D Printers.
+
+**Note:** It is the user's responsibility to determine **when** to update the furniture. Additionally, while this API provides mechanisms to pass a unique ID to the furniture, users have to define the ID and the naming system. 
+
+To control what types of Furnitures that can be generated, please refer to **3.i. Furniture Objects**. To request for a Furniture object, please email lemurarvrfurniture@gmail.com with the following details: **1. The type of furniture you wish you make; 2. The way you would like to define that furniture; 3. Examples of this furniture that we can use as a reference point.**
 
 ----
 
@@ -82,24 +91,42 @@ stool | height : 10; radius : 20; legs : 2
 #### Creating a Furniture
 The following two overloaded functions are used to generate a Furniture:
 
-`public void MakeFurniture(Dictionary<string, float> localparameters, string ftype, int id)`
+`public int MakeFurniture(Dictionary<string, float> localparameters, string ftype, int id, Vector3 location, Quaternion rotation = DisplayObject.transform.rotation, Vector3 scale = DisplayObject.transform.localScale)`
 
 **Definition**: A call to make a furniture with user-defined parameters. Generates a GameObject that holds the mesh of the furniture with corresponding physics interactions and collision detection.
+
+Return Code | Description
+----------- | -----------
+0 | Successful creation of Furniture
+1 | Failed to retrieve mesh from server
+2 | Invalid parameters
 
 Parameter | Type | Description
 --------- | ---- | -----------
 localparameters | Dictinoary<string, float> | Parameters passed by the user to generate a specified furniture
 ftype | string | A string that holds the **type** of Furniture that the user wants to generate
 id | int | An identifier that the user can define to distinguish this particular Furniture
+location | Vector3 | Specifies the location at which the Furniture will spawn
+rotation *(optional)* | Quaternion | Specifies the rotation of the Furniture when it spawns; Default is Quaternion Identity (1, 1, 1, 1)
+scale *(optional)* | Vector3 | Specifies the scale of the Furniture when it spawns; Default is (0.01f, 0.01f, 0.01f)
 
-`public Dictionary<string, float> MakeFurniture (string ftype, int id)`
+`public Dictionary<string, float> MakeFurniture (string ftype, int id, Vector3 location, Quaternion rotation = DisplayObject.transform.rotation, Vector3 scale = DisplayObject.transform.localScale)`
 
 **Definition**: A call to make a furniture without user-defined parameters. By default, the Furniture will consult the **FurnitureCatalog** for the default values, and generates an object using those default values. Generates a GameObject that holds the mesh of the furniture with corresponding physics interactions and collision detection. The parameters that were used are returned as a Dictionary<string, float>, which the user can reference and make modifications to.
+
+
+Return Code | Description
+----------- | -----------
+null | Failed to retrieve mesh from server
+valid Dictionary<string, float> | Successful retrieval of furniture object
 
 Parameter | Type | Description
 --------- | ---- | -----------
 ftype | string | A string that holds the **type** of Furniture that the user wants to generate
 id | int | An identifier that the user can define to distinguish this particular Furniture
+location | Vector3 | Specifies the location at which the Furniture will spawn
+rotation *(optional)* | Quaternion | Specifies the rotation of the Furniture when it spawns; Default is Quaternion Identity (1, 1, 1, 1)
+scale *(optional)* | Vector3 | Specifies the scale of the Furniture when it spawns; Default is (0.01f, 0.01f, 0.01f)
 
 In both cases, the inherent code is identical, but the parameters and return results are different. The first iteration of MakeFurniture allows users to have more fine-grained control of the Furniture parameters when they create a Furniture. The second method of MakeFurniture simplifies the process by creating a default Furniture first, and then passing the corresponding values that users can modify later. The second method is preferred only when users have no idea what type of furniture they want to make. 
 
@@ -142,8 +169,14 @@ stool.MakeFurniture(stoolparameters, "stool", 1);
 #### Updating a Furniture
 Furnitures can only be updated once it has been created. To update the furniture, users must call the following function:
 
-`public void UpdateFurniture(Dictionary<string, float> localparameters)`
+`public int UpdateFurniture(Dictionary<string, float> localparameters)`
+
 **Definition**: A call to update an existing Furniture object. Users must pass parameters that match with the existing **type** of furniture that has been created. The **parameters** will be updated to the **local** argument, and a new mesh will be generated corresponding to the new Furniture object.
+
+Return Code | Description
+----------- | -----------
+0 | Successful creation of Furniture
+1 | Failed to retrieve mesh from server
 
 Parameter | Type | Description
 --------- | ---- | -----------
@@ -165,6 +198,7 @@ stool.UpdateParameter(newstoolparameters);
 Furniture information can be accessed using the `FARVR.Furniture.Display()` Function, which logs all the information regarding the furniture object.
 
 `public void Display();`
+
 **Definition**: A call to display all information about the current Furniture, include its real-world coordinates, the local parameters, the **type** and the **ID**. Currently logs the information in the console, but will look to display it as text later on.
 
 Similar to before, you can call `FARVR.Furniture.Display()` as shown:
@@ -191,10 +225,16 @@ Destroy can only be called after a Furniture has been created.
 ----
 
 #### Exporting a Furniture
-To export a furniture, simply call the function `FARVR.Furniture.Export()`, which saves the resulting mesh as an STL file.
+To export a furniture, simply call the function `FARVR.Furniture.Export()`, which saves the resulting mesh as an STL file. By default, the STL file is saved in the folder at which the application's cache or downloaded items are stored. For more information, see [Unity Application DataPath](https://docs.unity3d.com/ScriptReference/Application-dataPath.html).
 
-`public void Export()`
+`public int Export()`
+
 **Definition**: Takes all existing **parameters** in the Furniture object and then sends it over to the server to generate an STL file. The bytes from the STL file will then be transferred into a .stl file that is saved with the application path.
+
+Return Code | Description
+----------- | -----------
+0 | Successful export of Furniture
+1 | Failed to retrieve STL from server
 
 Similar to before, you can call `FARVR.Furniture.Export()` as shown:
 
@@ -208,7 +248,7 @@ Export can only be called after a furniture has been created. It cannot be calle
 
 ----
 
-### Adding New Furniture Types
+### Adding New Furniture Types/Modifying the Furniture Catalog
 To add new Furniture types, users have to manually update and modify the **FurnitureCatalog** that is found in our **Furniture.cs** class. Please note that this will only work provided the server a) recognizes the Furniture **type**, b) has exactly the paramaeters it needs from **parameters** and c) the parameters fit a certain range and value that is defined by the compiler.
 
 To add an entry in the furniture type, simply follow the following format:
@@ -243,10 +283,12 @@ To play around with the Furniture API, please refer to the **APIScene** found in
 
 A thorough demonstration of the API at work is shown through [the following youtube video](https://www.youtube.com/watch?v=QbHisCfoSfE&feature=youtu.be).
 
+**--If you have video demonstrations or examples implementing this API or library, please send us your videos or work at lemurarvrfurniture@gmail.com. We would love to hear from you!--**
+
 ### Update Log and Current Work in Progress
 - [x] Designed and documented preliminary API
 - [ ] Tested API across AR and VR environments
 - [ ] Implemented Materials and Rendering Mesh into Furniture
-- [ ] Generate Exit Codes that detect and handle errors
+- [x] Generate Exit Codes that detect and handle errors
 - [x] Offer example scenes for users
-- [ ] Offer transformation functions for moving, rotating, and scaling GameObject
+- [x] Offer transformation functions for moving, rotating, and scaling GameObject
