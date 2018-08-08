@@ -248,6 +248,50 @@ Export can only be called after a furniture has been created. It cannot be calle
 
 ----
 
+### Transforming a Furniture
+To translate, rotate, or scale the furniture, call the function `FARVR.Furniture.TransformFurniture()`, which translates, rotates, and scales the **DisplayObject** all at once. 
+
+`public int TransformFurniture(Vector3 translate, Quaternion rotate, Vector3 scale)`
+
+**Definition**: Translates, rotates, and/or scales the **DisplayObject** that visualizes the Furniture object. Ignores any transformations if they are identical to the corresponding transformation of the current Furniture.
+
+Return Code | Description
+----------- | -----------
+0 | Successful transformation
+1 | Invalid parameters
+
+Parameter | Type | Description
+--------- | ---- | -----------
+location | Vector3 | Specifies the location at which the Furniture will spawn
+rotation | Quaternion | Specifies the rotation of the Furniture when it spawns
+scale | Vector3 | Specifies the scale of the Furniture when it spawns
+
+Corresponding to this function, we also offer additional functions to get the current Position, Rotation, and/or Scale of the Furniture. This can be accessed as follows:
+
+`public Vector3 GetPosition()`
+
+**Definition**: Returns the current position of the Furniture using a Vector3, as represented by **DisplayObject**.
+
+`public Vector3 GetScale()`
+
+**Definition**: Returns the current scale of the Furniture using a Vector3, as represented by **DisplayObject**.
+
+`public Quaternion GetRotation()`
+
+**Definition**: Returns the current rotation of the Furniture using a Quaternion, as represented by **DisplayObject**.
+
+Unlike `MakeFurniture()`, `TransformFurniture()` **_requires_** users to specify all 3 forms of transformations of the **DisplayObject**. In the case where users wish to only manipulate one or some of the arguments, they can pass the current transformation of the Furniture as follows:
+
+```
+Furniture FurnitureObj;
+
+/* Initialize the Furniture and update it as needed */
+
+FurnitureObj.TransformFurniture(FurnitureObj.GetPosition(), FurnitureObj.GetRotation(), FurnitureObj.GetScale());
+```
+
+----
+
 ### Adding New Furniture Types/Modifying the Furniture Catalog
 To add new Furniture types, users have to manually update and modify the **FurnitureCatalog** that is found in our **Furniture.cs** class. Please note that this will only work provided the server a) recognizes the Furniture **type**, b) has exactly the paramaeters it needs from **parameters** and c) the parameters fit a certain range and value that is defined by the compiler.
 
