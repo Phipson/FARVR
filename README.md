@@ -45,7 +45,7 @@ at the top of your file. This will enable your script to recognize the furniture
 
 The following diagram illustrates the lifecycle of a Furniture object, and how data is manipulated. Details will be provided for each stage in the following subsections.
 
-/* Insert Diagram here */
+![Lifecycle of Furniture Object](https://github.com/Phipson/FARVR/blob/master/FurnitureLifeCycle.png)
 
 The furniture object is first created under a Prefab known as Furniture.prefab, found in our **Prefabs** folder. From there, users can manually retrieve a Furniture object from that GameObject, which allows them to construct a Furniture using the `MakeFurniture()` function. As they are manipulating the furniture, they can get instant, real-time feedback of their modifications using the `UpdateFurniture()` function, which retrieves data from a generative backend compiler that passes an STL binary to the Unity environment. If users wish to move the furniture, while also preserving the internal parameters of the object, they can call the function `TransformFurniture()`, which translates, rotates, and scales the furniture according to the user's liking.
 
