@@ -103,7 +103,7 @@ public class FurnitureHandlerScript : MonoBehaviour {
 		//Stage 2: Transform the STL into a working Mesh
 		MemoryStream stream = new MemoryStream(data);
 
-		Mesh[] meshes = pb_Stl_Importer.ImportBinary(stream);
+		Mesh[] meshes = Importer.ImportBinary(stream);
 
 		Debug.Log(meshes);
 		Debug.Log("size of meshes are: " + meshes.Length.ToString());

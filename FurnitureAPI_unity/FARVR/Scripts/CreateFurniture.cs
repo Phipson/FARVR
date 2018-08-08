@@ -45,7 +45,7 @@ public class CreateFurniture : MonoBehaviour {
 	void Create(Dictionary<string, float> parameters, string type, int id) {
 		GameObject gameobj = Instantiate (prefab) as GameObject;
 		Furniture furnitureobj = gameobj.GetComponent<Furniture> ();
-		furnitureobj.MakeFurniture (parameters, type, id);
+		Debug.Log(furnitureobj.MakeFurniture (parameters, type, id, new Vector3(0, 0, 0)));
 		furnitureobj.Display ();
 		RegisterFurniture (furnitureobj);
 	}

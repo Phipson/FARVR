@@ -5,8 +5,8 @@ using UnityEngine.Networking;
 using System;
 using System.Text;
 using System.IO;
-using STLReader;
 using STLImporter;
+using Parabox.STL;
 
 namespace FARVR
 {
@@ -56,12 +56,16 @@ namespace FARVR
 		/// <summary>
 		/// Generates a furniture object by setting all the parameters in the object.
 		/// </summary>
+		/// <returns>RETURN CODE: 0 = Successful creation of Furniture; 1 = Failed to retrieve mesh from server; 2 = Invalid parameters</returns>
 		/// <param name="localparameters">Parameters used to generate a mesh</param>
 		/// <param name="ftype">The name of the furniture that we are to generate</param>
 		/// <param name="id">A unique ID for the furniture.</param>
-		public void MakeFurniture(Dictionary<string, float> localparameters, string ftype, int id)
+		public int MakeFurniture(Dictionary<string, float> localparameters, string ftype, int id, Vector3 location, Quaternion rotation, Vector3 scale)
         {
-			//TODO: Include the Position Vector and Rotation Vector in initialization
+			if (!VerifyFurniture (ftype, localparameters)) {
+				return 2;
+			}
+
 			// Hold the name of the furniture as the type of furniture
 			type = ftype;
 
@@ -83,6 +87,7 @@ namespace FARVR
 			Mesh[] meshes = GetSTL ();
 			if (meshes == null) {
 				Debug.Log ("Failed to get mesh");
+				return 1;
 			} else {
 				DisplayObject.GetComponent<MeshFilter>().mesh = meshes [0];
 				DisplayObject.AddComponent<MeshCollider> ();
@@ -90,64 +95,105 @@ namespace FARVR
 				DisplayObject.GetComponent<MeshCollider> ().convex = true;
 				DisplayObject.GetComponent<MeshCollider> ().sharedMaterial = Resources.Load ("Assets/FARVR/Prefabs/FurniturePhy") as PhysicMaterial;
 				DisplayObject.GetComponent<MeshCollider> ().cookingOptions = MeshColliderCookingOptions.InflateConvexMesh;
+				TransformFurniture(location, rotation, scale);
 			}
+			return 0;
+		}
+
+		// The following are overloaded functions that act as an alternative to default parameters
+		// Optional rotation AND scale
+		public int MakeFurniture(Dictionary<string, float> localparameters, string ftype, int id, Vector3 location) {
+			return MakeFurniture (localparameters, ftype, id, location, Quaternion.identity, new Vector3 (0.01f, 0.01f, 0.01f));
+		}
+
+		// Optional rotation
+		public int MakeFurniture(Dictionary<string, float> localparameters, string ftype, int id, Vector3 location, Vector3 scale) {
+			return MakeFurniture (localparameters, ftype, id, location, Quaternion.identity, scale);
+		}
+
+		// Optional scale
+		public int MakeFurniture(Dictionary<string, float> localparameters, string ftype, int id, Vector3 location, Quaternion rotate) {
+			return MakeFurniture (localparameters, ftype, id, location, rotate, new Vector3 (0.01f, 0.01f, 0.01f));
 		}
 
 		//Make furniture using catalog and predefined parameters
 		/// <summary>
 		/// Generates a furniture object by setting all the parameters in the object. Returns the parameters for the furniture
 		/// </summary>
+		/// <returns>Dictionary of the parameters that were used to generate the furniture; NULL = Invalid parameters</returns>
 		/// <param name="ftype">The name of the furniture that we are to generate</param>
 		/// <param name="id">A unique ID for the furniture.</param>
-		public Dictionary<string, float> MakeFurniture (string ftype, int id) {
+		public Dictionary<string, float> MakeFurniture (string ftype, int id, Vector3 location, Quaternion rotation, Vector3 scale) {
 			type = ftype;
 			ID = id;
-			// Consult FurnitureCatalog for suitable furniture
-			foreach(KeyValuePair<string, Dictionary<string, float>> entry in FurnitureCatalog) {
-				if (entry.Key == ftype) {
-					parameters = entry.Value;
 
-					// Generate object only if we have correct parameters 
-					//Make new GameObject;
-					DisplayObject = Instantiate(Prefab) as GameObject;
+			//Verify that the furniture is valid
+			if (!VerifyFurniture (ftype)) {
+				Debug.Log ("Failed to find valid furniture");
+				return null;
+			} else {
+				//If the furniture is valid
+				parameters = FurnitureCatalog [ftype];
 
-					DisplayObject.name = type + ID.ToString ();
-					DisplayObject.AddComponent<MeshFilter> ();
-					DisplayObject.AddComponent<MeshRenderer> ();
+				type = ftype;
+				ID = id;
 
-					// TODO: Add Physics collision to object
-					// furniture.DisplayObject.AddComponent<MeshCollider> ();
-					Mesh[] meshes = GetSTL ();
-					if (meshes == null) {
-						Debug.Log ("Failed to get mesh");
-					} else {
-						DisplayObject.GetComponent<MeshFilter>().mesh = meshes [0];
-						DisplayObject.AddComponent<MeshCollider> ();
-						DisplayObject.GetComponent<MeshCollider> ().sharedMesh = meshes [0];
-						DisplayObject.GetComponent<MeshCollider> ().convex = true;
-						DisplayObject.GetComponent<MeshCollider> ().sharedMaterial = Resources.Load ("Assets/FARVR/Prefabs/FurniturePhy") as PhysicMaterial;
-						DisplayObject.GetComponent<MeshCollider> ().cookingOptions = MeshColliderCookingOptions.InflateConvexMesh;
-					}
+				//Make new GameObject;
+				DisplayObject = Instantiate(Prefab) as GameObject;
+
+				DisplayObject.name = type + ID.ToString ();
+				DisplayObject.AddComponent<MeshFilter> ();
+				DisplayObject.AddComponent<MeshRenderer> ();
+
+				// TODO: Add Physics collision to object
+				// furniture.DisplayObject.AddComponent<MeshCollider> ();
+				Mesh[] meshes = GetSTL ();
+				if (meshes == null) {
+					Debug.Log ("Failed to get mesh");
+					return null;
+				} else {
+					DisplayObject.GetComponent<MeshFilter>().mesh = meshes [0];
+					DisplayObject.AddComponent<MeshCollider> ();
+					DisplayObject.GetComponent<MeshCollider> ().sharedMesh = meshes [0];
+					DisplayObject.GetComponent<MeshCollider> ().convex = true;
+					DisplayObject.GetComponent<MeshCollider> ().sharedMaterial = Resources.Load ("Assets/FARVR/Prefabs/FurniturePhy") as PhysicMaterial;
+					DisplayObject.GetComponent<MeshCollider> ().cookingOptions = MeshColliderCookingOptions.InflateConvexMesh;
+					TransformFurniture (location, rotation, scale);
 				}
 			}
-
-			Debug.Log ("Failed to find valid furniture");
 			return parameters;
+		}
+
+		// The following are overloaded functions that act as an alternative to default parameters
+		// Optional rotation AND scale
+		public Dictionary<string, float> MakeFurniture(string ftype, int id, Vector3 location) {
+			return MakeFurniture (ftype, id, location, Quaternion.identity, new Vector3 (0.01f, 0.01f, 0.01f));
+		}
+
+		// Optional rotation
+		public Dictionary<string, float> MakeFurniture(string ftype, int id, Vector3 location, Vector3 scale) {
+			return MakeFurniture (ftype, id, location, Quaternion.identity, scale);
+		}
+
+		// Optional scale
+		public Dictionary<string, float> MakeFurniture(string ftype, int id, Vector3 location, Quaternion rotate) {
+			return MakeFurniture (ftype, id, location, rotate, new Vector3 (0.01f, 0.01f, 0.01f));
 		}
 			
 		/// <summary>
 		/// Updates the furniture. Returns the corresponding mesh of the object and updates the furniture object.
 		/// </summary>
-		/// <returns>A mesh corresponding to the updated furniture.</returns>
+		/// <returns>RETURN CODE: 0 = Successfully updated furniture; 1 = Failed to retrieve mesh</returns>
 		/// <param name="local">Local parameters of the given furniture.</param>
 		/// <param name="Furniture">The GameObject corresponding to the furniture</param>
-		public void UpdateFurniture(Dictionary<string, float> local) 
+		public int UpdateFurniture(Dictionary<string, float> localparameters) 
         { 
-			parameters = local;
+			parameters = localparameters;
             // Assuming we need to update the furniture
 			Mesh[] meshes = GetSTL ();
 			if (meshes == null) {
 				Debug.Log ("Failed to get mesh");
+				return 1;
 			} else {
 				DisplayObject.GetComponent<MeshFilter> ().mesh = meshes [0];
 				DisplayObject.GetComponent<MeshCollider> ().sharedMesh = meshes [0];
@@ -155,10 +201,50 @@ namespace FARVR
 				DisplayObject.GetComponent<MeshCollider> ().sharedMaterial = Resources.Load ("Assets/FARVR/Prefabs/FurniturePhy") as PhysicMaterial;
 				DisplayObject.GetComponent<MeshCollider> ().cookingOptions = MeshColliderCookingOptions.InflateConvexMesh;
 			}
+			return 0;
         }
 
 		/// <summary>
-		/// Display all the data about the current furniture
+		/// Transforms the furniture.
+		/// </summary>
+		/// <returns>RETURN CODE: 0 = Successful update of transformation; 1 = Invalid parameters</returns>
+		/// <param name="translate">Vector3 for new object position.</param>
+		/// <param name="rotate">Quarternion rotation for new object rotation.</param>
+		/// <param name="scale">Vector3 for new object localscale.</param>
+		public int TransformFurniture(Vector3 translate, Quaternion rotate, Vector3 scale) {
+			if (translate != DisplayObject.transform.position) {
+				DisplayObject.transform.position = translate;
+			}
+
+			if (rotate != DisplayObject.transform.rotation) {
+				DisplayObject.transform.rotation = rotate;
+			}
+
+			Vector3 scaler = new Vector3 (0.01f * scale.x, 0.01f * scale.y, 0.01f * scale.z);
+
+			if (scaler != DisplayObject.transform.localScale) {
+				DisplayObject.transform.localScale = scaler;
+			}
+
+			return 0;
+		}
+
+		// To obtain transformations of furniture
+		public Vector3 GetPosition() {
+			return DisplayObject.transform.position;
+		}
+
+		public Vector3 GetScale() {
+			Vector3 scale = DisplayObject.transform.localScale;
+			return (new Vector3 (scale.x / 0.01f, scale.y / 0.01f, scale.z / 0.01f));
+		}
+
+		public Quaternion GetRotation() {
+			return DisplayObject.transform.rotation;
+		}
+
+		/// <summary>
+		/// Display all the data about the current furniture. For Debugging Purposes.
 		/// </summary>
 		public void Display()
         {
@@ -176,11 +262,57 @@ namespace FARVR
         }
 
         // Save and export the STL File from the object
-        public void Export()
+		/// <summary>
+		/// Export this instance.
+		/// </summary>
+		/// <returns>RETURN CODE: 0 = Successfully exported STL File; 1 = Failed to export STL file</returns>
+        public int Export()
         { 
             // This should be the same for all of the children, which is why it should be modified here 
-			ExportSTL();
+			if (!ExportSTL ()) {
+				return 1;
+			} else {
+				return 0;
+			}
         }
+
+		// Verify Furniture parameters via FurnitureCatalog
+		private bool VerifyFurniture(string type, Dictionary<string, float> parameter) {
+			foreach (KeyValuePair<string, Dictionary<string, float>> entry in FurnitureCatalog) {
+				// Check if furniture type exists
+				if (entry.Key == type) {
+					// If the type exists, we verify the parameters are valid
+					// Search the dictionary from FurnitureCatalog and the parameters to find similarity
+					foreach (KeyValuePair<string, float> requirement in entry.Value) {
+						// To verify all parameters, we ensure we can find one of each value entry
+						bool match = false;
+						foreach (KeyValuePair<string, float> comparer in parameter) {
+							//Once we find a match, we don't have to search exhaustively
+							if (comparer.Key == requirement.Key) {
+								match = true;
+								break;
+							}
+						}
+
+						// If we do not find a match after searching through all the parameters, then we can confirm that parameters are invalid
+						if (!match) {
+							return false;
+						}
+					}
+
+					// If we search through entire parameter and all match, then it is valid
+					return true;
+				}
+			}
+
+			// If we can't find the correct type, then it is invalid
+			return false;
+		}
+
+		// Overloaded version of VerifyFurniture that only takes type
+		private bool VerifyFurniture(string type) {
+			return VerifyFurniture(type, parameters);
+		}
 
 		// The single function we will use to get an STL binary file
 		private Mesh[] GetSTL(){
@@ -208,52 +340,36 @@ namespace FARVR
 				// Or retrieve results as binary data
 				byte[] results = www.downloadHandler.data;
 
-				holder = MakeFurniture(results);
+				holder = MakeMesh(results);
 			}
 		}
-
 		return holder;
 		}
 
-		private void ExportSTL() {
-			string url = "http://ayeaye.ee.ucla.edu:5000/{0}.stl?{1}";
+		//Exports STL into a .stl file for printing and manufacturing
+		private bool ExportSTL() {
+			GameObject[] garr = new GameObject[1];
 
-			//Stage 1: Get the STL Binary from the server
-			string param = LinkParam(parameters);
+			garr [0] = DisplayObject;
 
-			url = string.Format(url, name, param);
+			string fileName = Application.persistentDataPath + "/" + type + ID + ".stl"; 
 
-			using (UnityWebRequest www = UnityWebRequest.Get(url))
-			{
-				www.SendWebRequest();
-				while (!www.isDone) ;
 
-				if (www.isNetworkError || www.isHttpError)
-				{
-					Debug.Log(www.error);
-				}
-				else
-				{
-					string fileName = Application.persistentDataPath + "/" + type + ID + ".stl"; 
 
-					System.IO.File.WriteAllBytes(fileName, www.downloadHandler.data);
-
-					if (System.IO.File.Exists ("file://" + Application.persistentDataPath + type + ID + ".stl")) { 
-						print ("File does exist"); 
-					} else {
-						print ("File does not exist");
-					}
-				}
+			if (pb_Stl_Exporter.Export(fileName, garr, FileType.Binary)) {
+				return true;
+			} else {
+				return false;
 			}
 
 		}
 
 		// A function to read the bytes into furniture object
-		private Mesh[] MakeFurniture(byte[] data) {
+		private Mesh[] MakeMesh(byte[] data) {
 			//Stage 2: Transform the STL into a working Mesh
 			MemoryStream stream = new MemoryStream(data);
 
-			Mesh[] meshes = pb_Stl_Importer.ImportBinary(stream);
+			Mesh[] meshes = Importer.ImportBinary(stream);
 
 			Debug.Log(meshes);
 			Debug.Log("size of meshes are: " + meshes.Length.ToString());
@@ -280,8 +396,6 @@ namespace FARVR
 
 			// For the last string we have an extra ampersand sign at the end
 			result = result.Substring(0, result.Length - 1);
-
-			Debug.Log(result);
 
 			return result;
 		}

@@ -11,7 +11,7 @@ namespace STLImporter
 	/**
 	 * Import methods for STL files.
 	 */
-	public static class pb_Stl_Importer
+	public static class Importer
 	{
 		const int MAX_FACETS_PER_MESH = 65535 / 3;
 
