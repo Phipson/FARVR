@@ -20,7 +20,9 @@ The following is a repository containing a library used to optimize and simplify
 5. **Update Log and Current Work in Progress**
 
 ### Software Requirements
-The original Furniture API was developed using Unity 2017 f2.0b. The API has also been tested on Unity 2017 f4.3b and Unity 2017 f3.0b. We have developed it such that it should be compatible with all versions of Unity with a minimum requirement of 2017 2.0+. If there are any known issues with the API, please report the error with details about the **Hardware and Software that you are using, as well as the error message and context in which this error occurs** at lemurarvrfurniture@gmail.com.
+The original Furniture API was developed using Unity 2017 f2.0b. The API has also been tested on Unity 2018 f2.2b, Unity 2017 f4.3b and Unity 2017 f3.0b. We have developed it such that it should be compatible with all versions of Unity with a minimum requirement of 2017 2.0+. If there are any known issues with the API, please report the error with details about the **Hardware and Software that you are using, as well as the error message and context in which this error occurs** at lemurarvrfurniture@gmail.com. 
+
+If you want to make this project accessible across all different versions of Unity, please refer to the [Unity Hub](https://blogs.unity3d.com/2018/01/24/streamline-your-workflow-introducing-unity-hub-beta/) for documentation.
 
 ### Installation Process
 By default, the Furniture API has been implemented as a Unity Asset, so to access the API as an asset:
@@ -338,7 +340,8 @@ A thorough demonstration of the API at work is shown through [the following yout
 
 ### Update Log and Current Work in Progress
 - [x] Designed and documented preliminary API
-- [ ] Tested API across AR and VR environments
+- [x] Tested API in VR Environment
+- [ ] Tested API in AR Environment
 - [ ] Implemented Materials and Rendering Mesh into Furniture
 - [x] Generate Exit Codes that detect and handle errors
 - [x] Offer example scenes for users
