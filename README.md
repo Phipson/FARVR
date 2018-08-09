@@ -53,7 +53,7 @@ Once furnitures have been defined, users are also free to obtain and visualize t
 
 **Note:** It is the user's responsibility to determine **when** to update the furniture. Additionally, while this API provides mechanisms to pass a unique ID to the furniture, users have to define the ID and the naming system. 
 
-To control what types of Furnitures that can be generated, please refer to **3.i. Furniture Objects**. To request for a Furniture object, please email lemurarvrfurniture@gmail.com with the following details: **1. The type of furniture you wish you make; 2. The way you would like to define that furniture; 3. Examples of this furniture that we can use as a reference point.**
+To control what types of Furnitures that can be generated, please refer to **3.i. Furniture Objects**. To request for a Furniture object, please email lemurarvrfurniture@gmail.com with the following details: **1. The type of furniture you wish to make; 2. The way you would like to define that furniture; 3. Examples of this furniture that we can use as a reference point.**
 
 ----
 
