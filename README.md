@@ -33,6 +33,13 @@ By default, the Furniture API has been implemented as a Unity Asset, so to acces
 6. To use the Unity project, create an Empty GameObject and drag the corresponding CreateFurniture.cs script into it as a component, found in our **Scripts** folder.
 7. If you are struggling to figure out how the API works, you can also choose to duplicate our existing **APIScene** found in our **Scenes** folder.
 
+**For Users Using our APIScene:**
+1. In our GameObject named **FurnitureAPI**, you may find that there is a missing script. Please drag the script **CreateFurniture.cs** from our **Scripts** folder to replace the missing script. For now, drag the sliders from the **Canvas** GameObject into the corresponding inputs for the script, and then drag the **Furniture.prefab** object from our **Prefabs** folder into the supplied Prefab object.
+
+2. In the **Furniture.prefab** object, you may also find that there is a missing script. Please drag the **Furniture.cs** script from our **Scripts** folder to replace the missing script. Once you do so, you will be asked to also provide a Prefab. In this case, drag the **DisplayObject.prefab** object into that Prefab box.
+
+Once you do that, you should be able to run our APIScene.
+
 ### Documentation of API
 The following documentation is exclusive to Unity, and is written in C# code. We currently do not have any plans for designing the API across other game engines such as Unreal, but may look to do so if there are sufficient demands for it in future.
 
