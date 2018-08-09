@@ -95,7 +95,12 @@ namespace FARVR
 				DisplayObject.GetComponent<MeshCollider> ().convex = true;
 				DisplayObject.GetComponent<MeshCollider> ().sharedMaterial = Resources.Load ("Assets/FARVR/Prefabs/FurniturePhy") as PhysicMaterial;
 				DisplayObject.GetComponent<MeshCollider> ().cookingOptions = MeshColliderCookingOptions.InflateConvexMesh;
+
+				/* Transforms the furniture based on what we have initialized it to be */
 				TransformFurniture(location, rotation, scale);
+
+				/* Update: Added a Collider tag that allows us to distinguish whether an Existing Furniture was hit or not */
+				DisplayObject.tag = "Furniture";
 			}
 			return 0;
 		}
@@ -103,7 +108,7 @@ namespace FARVR
 		// The following are overloaded functions that act as an alternative to default parameters
 		// Optional rotation AND scale
 		public int MakeFurniture(Dictionary<string, float> localparameters, string ftype, int id, Vector3 location) {
-			return MakeFurniture (localparameters, ftype, id, location, Quaternion.identity, new Vector3 (0.01f, 0.01f, 0.01f));
+			return MakeFurniture (localparameters, ftype, id, location, Quaternion.identity, new Vector3 (1f, 1f, 1f));
 		}
 
 		// Optional rotation
@@ -113,7 +118,7 @@ namespace FARVR
 
 		// Optional scale
 		public int MakeFurniture(Dictionary<string, float> localparameters, string ftype, int id, Vector3 location, Quaternion rotate) {
-			return MakeFurniture (localparameters, ftype, id, location, rotate, new Vector3 (0.01f, 0.01f, 0.01f));
+			return MakeFurniture (localparameters, ftype, id, location, rotate, new Vector3 (1f, 1f, 1f));
 		}
 
 		//Make furniture using catalog and predefined parameters
@@ -158,6 +163,8 @@ namespace FARVR
 					DisplayObject.GetComponent<MeshCollider> ().convex = true;
 					DisplayObject.GetComponent<MeshCollider> ().sharedMaterial = Resources.Load ("Assets/FARVR/Prefabs/FurniturePhy") as PhysicMaterial;
 					DisplayObject.GetComponent<MeshCollider> ().cookingOptions = MeshColliderCookingOptions.InflateConvexMesh;
+
+					/*  Transform the furniture based on provided parameters */
 					TransformFurniture (location, rotation, scale);
 				}
 			}
@@ -167,7 +174,7 @@ namespace FARVR
 		// The following are overloaded functions that act as an alternative to default parameters
 		// Optional rotation AND scale
 		public Dictionary<string, float> MakeFurniture(string ftype, int id, Vector3 location) {
-			return MakeFurniture (ftype, id, location, Quaternion.identity, new Vector3 (0.01f, 0.01f, 0.01f));
+			return MakeFurniture (ftype, id, location, Quaternion.identity, new Vector3 (1f, 1f, 1f));
 		}
 
 		// Optional rotation
@@ -177,7 +184,7 @@ namespace FARVR
 
 		// Optional scale
 		public Dictionary<string, float> MakeFurniture(string ftype, int id, Vector3 location, Quaternion rotate) {
-			return MakeFurniture (ftype, id, location, rotate, new Vector3 (0.01f, 0.01f, 0.01f));
+			return MakeFurniture (ftype, id, location, rotate, new Vector3 (1f, 1f, 1f));
 		}
 			
 		/// <summary>
@@ -319,12 +326,14 @@ namespace FARVR
 		//Store Mesh
 		Mesh[] holder = null;
 
-		string url = "http://ayeaye.ee.ucla.edu:5000/{0}.stl?{1}";
+		/* If you wish to use a local server, please use the localhost url; otherwise, please use the given url */
+		//string url = "http://ayeaye.ee.ucla.edu:5000/{0}.stl?{1}";
+		string url = "http://localhost:5000/{0}.stl?{1}";
 
 		//Stage 1: Get the STL Binary from the server
 		string param = LinkParam(parameters);
 
-		url = string.Format(url, name, param);
+		url = string.Format(url, type, param);
 
 		using (UnityWebRequest www = UnityWebRequest.Get(url))
 		{
@@ -353,8 +362,6 @@ namespace FARVR
 			garr [0] = DisplayObject;
 
 			string fileName = Application.persistentDataPath + "/" + type + ID + ".stl"; 
-
-
 
 			if (pb_Stl_Exporter.Export(fileName, garr, FileType.Binary)) {
 				return true;
