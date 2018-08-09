@@ -34,6 +34,9 @@ By default, the Furniture API has been implemented as a Unity Asset, so to acces
 5. Ignore any warnings that may occur. If there are any errors with the file, it is best to reload the package by saving the project and then restarting Unity. This will allow Unity to link all the dlls and recompile the Asset library.
 6. To use the Unity project, create an Empty GameObject and drag the corresponding CreateFurniture.cs script into it as a component, found in our **Scripts** folder.
 7. If you are struggling to figure out how the API works, you can also choose to duplicate our existing **APIScene** found in our **Scenes** folder.
+8. Change the **url** according to whether you are running your own server, or whether you are running the project using the given *ayeaye* server.
+	1. If you choose to run the project using a **localhost** server, please use `string url = "http://localhost:5000/{0}.stl?{1}";`
+	2. Otherwise, please use `string url = "http://ayeaye.ee.ucla.edu:5000/{0}.stl?{1}";`
 
 **For Users Using our APIScene:**
 1. In our GameObject named **FurnitureAPI**, you may find that there is a missing script. Please drag the script **CreateFurniture.cs** from our **Scripts** folder to replace the missing script. For now, drag the sliders from the **Canvas** GameObject into the corresponding inputs for the script, and then drag the **Furniture.prefab** object from our **Prefabs** folder into the supplied Prefab object.
