@@ -117,7 +117,7 @@ ftype | string | A string that holds the **type** of Furniture that the user wan
 id | int | An identifier that the user can define to distinguish this particular Furniture
 location | Vector3 | Specifies the location at which the Furniture will spawn
 rotation *(optional)* | Quaternion | Specifies the rotation of the Furniture when it spawns; Default is Quaternion Identity (1, 1, 1, 1)
-scale *(optional)* | Vector3 | Specifies the scale of the Furniture when it spawns; Default is (0.01f, 0.01f, 0.01f)
+scale *(optional)* | Vector3 | Specifies the scale of the Furniture when it spawns; Default is (1f, 1f, 1f)
 
 `public Dictionary<string, float> MakeFurniture (string ftype, int id, Vector3 location, Quaternion rotation = DisplayObject.transform.rotation, Vector3 scale = DisplayObject.transform.localScale)`
 
